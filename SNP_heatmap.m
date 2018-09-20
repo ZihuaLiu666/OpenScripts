@@ -1,4 +1,29 @@
-function SNP_heatmap(mfilepath,namelistpath,nn,classlist,labelnum)
+function SNP_heatmap(mfilepath,namelistpath,chr,classlist,labelnum)
+% plot and save the SNP heatmap
+%
+% For example, SNP_heatmap('/Users/chr4A.phase.fre.vcf.plot','/Users/classlistwheat.txt','chr4A',[6 20 5 29 21],20)
+%
+% This script is very friendly to those who are not familiar with MATLAB.
+%
+% mfilepath:     The absoulute path of your input matrix file. In the matrix file,
+%                the first column contains the SNP position info and the rest coulnms are SNP info.
+%
+% namelistpath:  The absoulute path of sample label file. Notice! The namelist file must be a txt file.
+%                The format should be, for example, 
+%                                     W1
+%                                     W2
+%                                     W3
+%                                     W31
+%                                     W38
+%                                     ...
+%                                     D5
+%                                     
+%                                     
+% chr:           Chromosome name, for example, 'chr4A'.
+%
+% classlist:     It should be a list. For example, [6 20 5 29 21]. In this case, five populations are recorded.
+%
+% labelnum:      It decides the label number of Y-axis
 
 %Color map
 lblue = [216 240 245]./255;
@@ -59,7 +84,7 @@ pos = get(h,'Position');
 set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3)+11,pos(4)+5]);
 set(h,'Position',[0 0 7000 3000]);
 ylabel('Mb')
-title(sprintf('%s',nn),'FontSize',18);
+title(sprintf('%s',chr),'FontSize',18);
 
 % OUTPUT FILE PATH
 mfilepathI = strfind(mfilepath,'/');
