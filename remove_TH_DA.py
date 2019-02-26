@@ -109,7 +109,7 @@ def trans_query_reference_by_cigar(query, reference, cigar):
 def readbam(bam_file, fasta_file, wfile):
 
     genomeDict = product_list(fasta_file)
-    print(genomeDict['chr10'][3244897:3244897+153])
+    #print(genomeDict['chr10'][3244897:3244897+153])
 
     bamfile = pysam.AlignmentFile(bam_file,"rb")
     ofile = pysam.AlignmentFile(wfile, "w", template=bamfile)
@@ -123,9 +123,9 @@ def readbam(bam_file, fasta_file, wfile):
         # THIS SCRIPT HAS NO SENSITIVITY FOR DELETION OR INSERTION CONDITIONS
         if 'I' in r.cigarstring or 'D' in r.cigarstring:
             new_query, new_reference = trans_query_reference_by_cigar(query, reference, r.cigarstring)
-            if r.cigarstring == '81M4I65M':
-                print(new_query)
-                print(new_reference)
+            #if r.cigarstring == '81M4I65M':
+                #print(new_query)
+                #print(new_reference)
             if discard_TH_and_DA(new_query, new_reference) == 1:
             #if discard_TH_and_DA(new_query, new_reference) != 1:
                 ofile.write(r)
