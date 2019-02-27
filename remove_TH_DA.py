@@ -126,13 +126,13 @@ def readbam(bam_file, fasta_file, wfile):
             #if r.cigarstring == '81M4I65M':
                 #print(new_query)
                 #print(new_reference)
-            if discard_TH_and_DA(new_query, new_reference) == 1:
-            #if discard_TH_and_DA(new_query, new_reference) != 1:
+            #if discard_TH_and_DA(new_query, new_reference) == 1:
+            if discard_TH_and_DA(new_query, new_reference) != 1:
                 ofile.write(r)
             #continue
         else:
-            if discard_TH_and_DA(query, reference) == 1:
-            #if discard_TH_and_DA(query, reference) != 1:
+            #if discard_TH_and_DA(query, reference) == 1:
+            if discard_TH_and_DA(query, reference) != 1:
                 ofile.write(r)
     print('Congratulations! You can move to the next steps now!')
 
