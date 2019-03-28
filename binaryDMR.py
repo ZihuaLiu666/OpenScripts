@@ -16,16 +16,17 @@ args = parser.parse_args()
 
 def D5hmCR_finder_by_gene(ifile, breakpointvalue, ofile):
 
-    pca_matrix_name = ifile
     ifile = open(ifile)
     print('Working with TPM...')
     starttime = datetime.datetime.now()
     df = pd.read_csv(ifile, index_col=0, header=0, sep='\t')
     TotalCounts = [df[i].sum() for i in df.columns]
     column_index = [i for i in df.columns]
-    #  Ofile writing
-    cc = list(column_index)
+    outcluster = cluster_gather(column_index)
+    aa = sorted(outcluster.keys())
+    cc = sorted(outcluster.keys())
     cc.insert(0, 'name')
+    #  Ofile writing
     ofile.write('{}\n'.format('\t'.join(cc)))
 
     #  Optimization preallocation
@@ -47,7 +48,6 @@ def D5hmCR_finder_by_gene(ifile, breakpointvalue, ofile):
     starttime = datetime.datetime.now()
     linenum = TPM.shape[0]
     inum = 1
-    writinglist = []
     for i in TPM.index:
         inum += 1
         outputpercentage(linenum, inum)
@@ -55,12 +55,10 @@ def D5hmCR_finder_by_gene(ifile, breakpointvalue, ofile):
                 and sum(TPM.loc[i]) != 0 \
                 and row_compare(TPM.loc[i], pair_extreme) == 0:
             cross = Crossmeanstd(column_index, TPM.loc[i])
-            if breakpointvalue in cross:
-                body = np.array(TPM.loc[i]).tolist()
-                body.insert(0, i)
-                ofile.write('{}\n'.format('\t'.join([str(i) for i in body])))
-            else:
-                continue
+            if sum(cross.values()) <= breakpointvalue:
+                s = [cross[i] for i in aa]
+                s.insert(0, i)
+                ofile.write('{}\n'.format('\t'.join([str(i) for i in s])))
 
     endtime = datetime.datetime.now()
     print('Calculation done ...')
@@ -98,7 +96,6 @@ def cluster_gather(clusterlist):
 def Crossmeanstd(column_index, dfloc):
     #print(dfloc[0])
     outcluster = cluster_gather(column_index)
-    #print(outcluster)
     mean = defaultdict(list)
     std_mean = defaultdict(list)
     for k in outcluster.keys():
@@ -108,27 +105,31 @@ def Crossmeanstd(column_index, dfloc):
     sorted_TPM_list = sorted(mean.items(),
                              key=lambda x: x[1],
                              )
-    #print(sorted_TPM_list)
     #print(mean)
     #print(std_mean)
     sort_name = [i[0] for i in sorted_TPM_list]
-    #cross = {}
-    cross = []
+    #print(sort_name)
+    cross = {}
+    for i in sort_name:
+        cross[i] = 1
+    #cross = []
     c = 1
-    breakpoint = 1
+    #breakpoint = 0
     while c < len(sort_name):
+        cross[sort_name[0]] = 0
         value = sort_name[c]
         std_value = sort_name[c - 1]
         #cross[value] = (mean[value], std_mean[std_value])
         if mean[value] > std_mean[std_value]:
             #cross[value] = breakpoint
-            cross.append(breakpoint)
-            breakpoint += 1
+            #cross.append(breakpoint)
+            #breakpoint = 1
+            break
         else:
-            #cross[value] = 0
-            cross.append(breakpoint)
+            cross[value] = 0
+            #cross.append(breakpoint)
         c += 1
-    #print(cross)
+    #print(cross.values())
     return cross
 
 def outputpercentage(linenum, inum):
@@ -137,6 +138,7 @@ def outputpercentage(linenum, inum):
         sys.stdout.write("%.2f" % percent)
         sys.stdout.write("%\r")
         sys.stdout.flush()
+
 
 
 D5hmCR_finder_by_gene(ifile = args.inmatrix,
