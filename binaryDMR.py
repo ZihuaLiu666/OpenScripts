@@ -26,7 +26,7 @@ def D5hmCR_finder_by_gene(ifile, breakpointvalue, ofile):
     #  Ofile writing
     cc = list(column_index)
     cc.insert(0, 'name')
-    ofile.write('\t'.join(cc))
+    ofile.write('{}\n'.format('\t'.join(cc)))
 
     #  Optimization preallocation
     c = 0
@@ -40,13 +40,11 @@ def D5hmCR_finder_by_gene(ifile, breakpointvalue, ofile):
     print('time use is {} seconds'.format((endtime - starttime).seconds))
     #np.savetxt('TPM_PCA_{}_gene_{}'.format(ncp, threshold), TPM, delimiter='\t')
 
-
     td = 5
     pair_extreme = remove_low_confidence_gene_counts(TPM, td)
 
     print('Calculating ...')
     starttime = datetime.datetime.now()
-    pca_matrix = pd.DataFrame()
     linenum = TPM.shape[0]
     inum = 1
     writinglist = []
@@ -58,28 +56,14 @@ def D5hmCR_finder_by_gene(ifile, breakpointvalue, ofile):
                 and row_compare(TPM.loc[i], pair_extreme) == 0:
             cross = Crossmeanstd(column_index, TPM.loc[i])
             if breakpointvalue in cross:
-                #pca_matrix[i] = TPM.loc[i]
-                writinglist.append(i)
+                body = np.array(TPM.loc[i]).tolist()
+                body.insert(0, i)
+                ofile.write('{}\n'.format('\t'.join([str(i) for i in body])))
             else:
                 continue
 
     endtime = datetime.datetime.now()
     print('Calculation done ...')
-    print('time use is {} seconds'.format((endtime - starttime).seconds))
-
-    print('Writing ...')
-    starttime = datetime.datetime.now()
-    ##pca_matrix = pd.DataFrame()
-    ##for i in writinglist:
-    ##    pca_matrix[i] = TPM.loc[i]
-    ##print(pca_matrix)
-    pca_matrix.to_csv('{}_BP_{}.txt'.format(pca_matrix_name.split('.')[0], breakpointvalue),
-                      index=True,
-                      header=True,
-                      sep='\t',
-                      )
-    endtime = datetime.datetime.now()
-    print('Writing done ...')
     print('time use is {} seconds'.format((endtime - starttime).seconds))
 
 def remove_low_confidence_gene_counts(df, td):
